@@ -6,6 +6,7 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/3f5920af948d6785101d/test_coverage)](https://codeclimate.com/github/UotanKlein/frontend-project-11/test_coverage)
 
 ### Gihub Actions
+[![Node CI](https://github.com/UotanKlein/frontend-project-11/actions/workflows/ci.yml/badge.svg)](https://github.com/UotanKlein/frontend-project-11/actions/workflows/ci.yml)
 
 ### Setup
 ```make install```
