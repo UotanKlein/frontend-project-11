@@ -9,3 +9,9 @@ lint:
 
 lint-fix:
 	npx eslint --fix .
+
+coverage:
+	npm run coverage
+
+dependencies:
+	npm install
