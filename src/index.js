@@ -10,8 +10,6 @@ import * as yup from 'yup';
 import i18n from 'i18next';
 import axios from 'axios';
 
-const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-
 const translations = {
   ru: {
     translation: {
@@ -170,9 +168,9 @@ const initSite = () => {
     if (path === 'input') {
       validateForm({ input: value })
         .then((validatedData) => {
-          axios.get(proxyUrl + validatedData.input).then((res) => {
+          axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(validatedData.input)}`).then((res) => {
             const parser = new DOMParser();
-            const domRss = parser.parseFromString(res.data, 'text/xml');
+            const domRss = parser.parseFromString(res.data.contents, 'text/xml');
             const rssElement = domRss.querySelector('rss');
             if (!rssElement) {
               mapping.invalidRSS();
