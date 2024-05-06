@@ -3,7 +3,8 @@ html {
 }
 
 body {
-  overflow: hidden;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .bg-dark {
@@ -111,12 +112,16 @@ input {
   color: #fff;
   background-color: #0d6efd;
   border-color: #0d6efd;
+  font-size: 1rem;
 }
 
 .btn {
+  text-transform: none;
   font-weight: 400;
   line-height: 1.5;
   text-align: center;
+  border-radius: .2rem;
+  padding: .375rem .75rem;
   text-decoration: none;
   vertical-align: middle;
   cursor: pointer;
@@ -126,12 +131,9 @@ input {
 }
 
 .btn:hover {
-  background-color: #0b5ed7;
+  filter: brightness(0.9);
+  color: white;
   transition: 0.15s;
-}
-
-button {
-  text-transform: none;
 }
 
 .bg-light {
@@ -189,19 +191,121 @@ button {
   border: none;
 }
 
-.card {
-
-}
-
 .order-1 {
   order: 1;
 }
 
-ul {
-  padding: 0;
-  margin: 0;
-}
-
 li {
   list-style-type: none;
+  padding: 10px 16px;
+  padding-left: 0;
+}
+
+.p-2 {
+  padding: 2rem;
+}
+
+.btn-sm {
+  padding: .25rem .5rem;
+  font-size: .875rem;
+  border-radius: .2rem;
+}
+
+.btn-outline-primary {
+  color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.jc-sb {
+  justify-content: space-between;
+}
+
+a {
+  color: #0D6EFD;
+  transition: 0.15s;
+}
+
+a:hover {
+  color: #0b5ed7;
+  transition: 0.15s;
+}
+
+.text-break {
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.modal-footer > * {
+  margin: .25rem;
+}
+
+h5 {
+  font-size: 1.25rem;
+}
+
+.h6 {
+  font-size: 2rem;
+}
+
+.small {
+  font-size: .875em;
+}
+
+.list-group {
+  display: flex;
+  flex-direction: column;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.card-body {
+  flex: 1 1 auto;
+  padding: 1rem 1rem;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: .25rem;
+}
+
+.card-title {
+  margin-bottom: .5rem;
+}
+
+h4 {
+  font-size: calc(1.275rem + .3vw);
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-start {
+  align-items: start;
+}
+
+.list-group-item:first-child {
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+.list-group-item {
+  position: relative;
+  display: block;
+  padding: .5rem 1rem;
+  color: #212529;
+  text-decoration: none;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.a-test {
+  margin-right: 20px;
 }

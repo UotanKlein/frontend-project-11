@@ -4,11 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RSS агрегатор</title>
-  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap-grid.min.css">
-  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap-utilities.min.css">
-  <link rel="stylesheet" href="./src/index.css">
 <script defer src="index.js"></script></head>
 <body class="d-flex flex-column min-vh-100 mg-0">
+  <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="modal-body-text">Modal body text goes here.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary">Читать полностью</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>  
   <main class="flex-grow-1">
     <section class="container-fluid bg-dark p-5">
       <div class="row">
@@ -20,6 +34,7 @@
               <div class="col">
                 <div class="form-floating">
                   <input id="url-input" autofocus required name="url" aria-label="url" class="form-control w-100 valid" placeholder="Ссылка RSS" autocomplete="off">
+                  <label for="url-input">Ссылка RSS</label>
                 </div>
               </div>
               <div class="col-auto">
@@ -34,8 +49,10 @@
     </section>
     <section class="container-fluid p-5">
       <div class="row">
-        <div id="posts" class="col-8 mg-auto order-1"></div>
-        <div id="feeds" class="col-4 mg-auto order-1"></div>
+        <div class="col-md-10 col-lg-8 mg-auto d-flex">
+          <div id="posts" class="col-8 order-1"></div>
+          <div id="feeds" class="col-4 order-1"></div>
+        </div>
       </div>
     </section>
   </main>
@@ -47,7 +64,5 @@
       </div>
     </div>
   </footer>
-  <script src="./node_modules/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script type="module" src="./src/index.js"></script>
 </body>
 </html>

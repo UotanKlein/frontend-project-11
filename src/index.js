@@ -3,59 +3,26 @@
 import './index.css';
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
 import 'bootstrap/dist/css/bootstrap-utilities.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import 'bootstrap/dist/css/bootstrap.css';
+// eslint-disable-next-line
+import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js';
 
 import onChange from 'on-change';
 import * as yup from 'yup';
 import i18n from 'i18next';
 import axios from 'axios';
+// eslint-disable-next-line
+import translations from './translations.js';
 
-const translations = {
-  ru: {
-    translation: {
-      title: 'RSS агрегатор',
-      subtitle: 'Начните читать RSS сегодня! Это легко, это красиво.',
-      example: 'Пример: https://lorem-rss.hexlet.app/feed',
-      button: 'Добавить',
-      invalidRSS: 'Ресурс не содержит валидный RSS',
-      invalidLink: 'Ссылка должна быть валидным URL',
-      valid: 'RSS успешно загружен',
-      input: 'Cсылка RSS',
-      posts: 'Посты',
-      feeds: 'Фиды',
-      view: 'Просмотр',
-    }
+const initI18n = () => i18n.init({
+  lng: 'ru',
+  resources: translations,
+  useLocalStorage: true,
+  useDataAttrOptions: true,
+  interpolation: {
+    escapeValue: false,
   },
-  en: {
-    translation: {
-      title: 'RSS aggregator',
-      subtitle: 'Start reading RSS today! It\'s easy, it\'s beautiful.',
-      example: 'Example: https://lorem-rss.hexlet.app/feed',
-      button: 'Add',
-      invalidRSS: 'The resource does not contain a valid RSS',
-      invalidLink: 'The link must be a valid URL',
-      valid: 'RSS successfully loaded',
-      input: 'RSS link',
-      posts: 'Posts',
-      feeds: 'Feeds',
-      view: 'View',
-    }
-  }
-};
-
-const runApp = async () => {
-  await i18n.init({
-    lng: 'ru',
-    resources: translations,
-    useLocalStorage: true,
-    useDataAttrOptions: true,
-    interpolation: {
-      escapeValue: false,
-    }
-  });
-};
-
-runApp();
+});
 
 const schema = yup.object({
   input: yup.string().url().required(),
@@ -75,118 +42,169 @@ const initSite = () => {
       example: document.querySelector('.example'),
       feeds: document.querySelector('#feeds'),
       posts: document.querySelector('#posts'),
+      modalLabel: document.querySelector('#modalLabel'),
+      modalBodyText: document.querySelector('#modal-body-text'),
+      readFull: document.querySelector('#readFull'),
+      closeBtn: document.querySelector('#close-btn'),
     },
-    status: 'none', // valid, invalidRSS, invalidLink, none
+    status: 'none',
     input: null,
+    update: false,
+    timer: null,
   };
-
-  const mapping = {
-    changeTexts: () => {
-      state.elements.title.textContent = i18n.t('title');
-      state.elements.subtitle.textContent = i18n.t('subtitle');
-      state.elements.example.textContent = i18n.t('example');
-      state.elements.button.textContent = i18n.t('button');
-      state.elements.input.setAttribute('placeholder', i18n.t('input'));
-    },
-    invalidLink: () => {
-      state.elements.statusP.textContent = i18n.t('invalidLink');
-      state.elements.statusP.classList.remove('complete');
-      state.elements.statusP.classList.add('incomplete');
-      state.elements.input.classList.remove('valid');
-      state.elements.input.classList.add('invalid');
-      state.status = 'invalidLink';
-    },
-    invalidRSS: () => {
-      state.elements.statusP.textContent = i18n.t('invalidRSS');
-      state.elements.statusP.classList.remove('complete');
-      state.elements.statusP.classList.add('incomplete');
-      state.elements.input.classList.remove('invalid');
-      state.elements.input.classList.add('valid');
-      state.status = 'invalidRSS';
-    },
-    valid: () => {
-      state.elements.statusP.textContent = i18n.t('valid');
-      state.elements.statusP.classList.remove('incomplete');
-      state.elements.statusP.classList.add('complete');
-      state.elements.input.classList.remove('invalid');
-      state.elements.input.classList.add('valid');
-      state.status = 'valid';
-    },
-  };
-
-  const render = (title, desc, items) => {
-    const postContent = document.createElement('div');
-    postContent.classList.add('card', 'border-0');
-    const cardPostTitle = document.createElement('div');
-    const postTitle =  document.createElement('h2');
-    postTitle.textContent = i18n.t('posts');
-    cardPostTitle.append(postTitle);
-    postContent.append(cardPostTitle);
-
-    const feedsContent = document.createElement('div');
-    feedsContent.classList.add('card', 'border-0');
-    const cardFeedTitle = document.createElement('div');
-    const feedTitle =  document.createElement('h2');
-    feedTitle.textContent = i18n.t('feeds');
-    cardFeedTitle.append(feedTitle);
-    feedsContent.append(cardFeedTitle);
-
-    const ulFeed = document.createElement('ul')
-    const liFeed = document.createElement('li');
-    const liFeedTitle = document.createElement('h3');
-    liFeedTitle.textContent = title;
-    const liFeedDesc = document.createElement('p');
-    liFeedDesc.textContent = desc;
-    liFeed.append(liFeedTitle, liFeedDesc);
-
-    ulFeed.append(liFeed);
-    feedsContent.append(ulFeed);
-
-    const ul = document.createElement('ul');
-
-    items.forEach(item => {
-      const title = item.querySelector('title').textContent;
-      const link = item.querySelector('link').textContent;
-
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.setAttribute('href', link);
-      a.textContent = title;
-      li.append(a);
-      ul.append(li);
-    });
-
-    postContent.append(ul);
-
-    state.elements.posts.append(postContent)
-    state.elements.feeds.append(feedsContent)
-
-    mapping.valid();
-  }
 
   const watchedObject = onChange(state, (path, value) => {
     if (path === 'input') {
-      validateForm({ input: value })
-        .then((validatedData) => {
-          axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(validatedData.input)}`).then((res) => {
-            const parser = new DOMParser();
-            const domRss = parser.parseFromString(res.data.contents, 'text/xml');
-            const rssElement = domRss.querySelector('rss');
-            if (!rssElement) {
-              mapping.invalidRSS();
-            }
-            const channel = domRss.querySelector('channel');
-            const feedTitle = channel.querySelector('title').textContent;
-            const feedDescription = channel.querySelector('description').textContent;
-            const items = domRss.querySelectorAll('item');
-            render(feedTitle, feedDescription, items);
-          }).catch((error) => console.error(error.message));
-        })
-        .catch(() => {
-          mapping.invalidLink();
-        });
+      // eslint-disable-next-line
+      updateRSS(value);
+    }
+
+    if (path === 'update') {
+      // eslint-disable-next-line
+      setTimer();
     }
   });
+
+  const mapping = {
+    changeTexts: () => {
+      const { elements } = state;
+      elements.title.textContent = i18n.t('title');
+      elements.subtitle.textContent = i18n.t('subtitle');
+      elements.example.textContent = i18n.t('example');
+      elements.button.textContent = i18n.t('button');
+      state.elements.readFull.textContent = i18n.t('readFull');
+      state.elements.closeBtn.textContent = i18n.t('close');
+      elements.input.setAttribute('placeholder', i18n.t('input'));
+    },
+    updateStatus: (text, addClass, removeClass) => {
+      const { elements } = state;
+      elements.statusP.textContent = i18n.t(text);
+      elements.statusP.classList.remove(removeClass);
+      elements.statusP.classList.add(addClass);
+      state.status = addClass;
+      if (addClass === 'valid') {
+        elements.input.classList.remove('invalid');
+        elements.input.classList.add('valid');
+      } else if (addClass === 'invalid') {
+        elements.input.classList.remove('valid');
+        elements.input.classList.add('invalid');
+      }
+    },
+    invalidLink: () => {
+      mapping.updateStatus('invalidLink', 'incomplete', 'complete');
+      watchedObject.update = false;
+    },
+    invalidRSS: () => {
+      mapping.updateStatus('invalidRSS', 'incomplete', 'complete');
+      watchedObject.update = false;
+    },
+    valid: () => {
+      mapping.updateStatus('valid', 'complete', 'incomplete');
+      watchedObject.update = true;
+    },
+  };
+
+  function updateRSS(value) {
+    validateForm({ input: value })
+      .then((validatedData) => {
+        axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(validatedData.input)}`).then((res) => {
+          const parser = new DOMParser();
+          const domRss = parser.parseFromString(res.data.contents, 'text/xml');
+          const rssElement = domRss.querySelector('rss');
+          if (!rssElement) {
+            mapping.invalidRSS();
+          }
+          const channel = domRss.querySelector('channel');
+          const feedTitle = channel.querySelector('title').textContent;
+          const feedDescription = channel.querySelector('description').textContent;
+          const items = domRss.querySelectorAll('item');
+          // eslint-disable-next-line
+          render(feedTitle, feedDescription, items);
+        })
+          // eslint-disable-next-line
+          .catch((error) => console.error(error.message));
+      })
+      .catch(() => {
+        mapping.invalidLink();
+      });
+  }
+
+  function setTimer() {
+    if (watchedObject.update) {
+      watchedObject.timer = setTimeout(() => {
+        updateRSS(watchedObject.input);
+        setTimer();
+      }, 20000);
+    } else if (watchedObject.timer !== null) {
+      window.clearTimeout(watchedObject.timer);
+      watchedObject.timer = null;
+    }
+  }
+
+  function render(title, desc, items) {
+    const createFeedElement = (feedTitle, feedDesc) => {
+      const feedElement = document.createElement('li');
+      feedElement.classList.add('list-group-item', 'border-0');
+      feedElement.innerHTML = `
+        <h3 class="h6 mg-0">${feedTitle}</h3>
+        <p class="m-0 small text-black-50">${feedDesc}</p>
+      `;
+      return feedElement;
+    };
+
+    const createListItem = (itemTitle, link, descItem) => {
+      const listItem = document.createElement('li');
+      listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0');
+      listItem.innerHTML = `
+        <div class="d-flex jc-sb">
+          <a class="a-test" href="${link}">${itemTitle}</a>
+          <button class="btn-sm btn-outline-primary btn" type="button">${i18n.t('view')}</button>
+        </div>
+      `;
+      listItem.querySelector('button').addEventListener('click', () => {
+        const myModal = new bootstrap.Modal(document.getElementById('modal'));
+        state.elements.modalLabel.textContent = itemTitle;
+        state.elements.modalBodyText.textContent = descItem;
+        state.elements.readFull.setAttribute('href', link);
+        state.elements.readFull.textContent = i18n.t('readFull');
+        myModal.toggle();
+      });
+      return listItem;
+    };
+
+    const postContent = document.createElement('div');
+    postContent.className = 'card border-0';
+    postContent.innerHTML = `<div class="card-body"><h2 class="card-title h4">${i18n.t('posts')}</h2></div>`;
+
+    const feedsContent = document.createElement('div');
+    feedsContent.className = 'card border-0';
+    feedsContent.innerHTML = `<div class="card-body"><h2 class="card-title h4">${i18n.t('feeds')}</h2></div>`;
+
+    const ulFeed = document.createElement('ul');
+    ulFeed.classList.add('list-group', 'border-0', 'rounded-0');
+    const feedElement = createFeedElement(title, desc);
+    ulFeed.appendChild(feedElement);
+    feedsContent.appendChild(ulFeed);
+
+    const ul = document.createElement('ul');
+    items.forEach((item) => {
+      const itemTitle = item.querySelector('title').textContent;
+      const link = item.querySelector('link').textContent;
+      const descItem = item.querySelector('description').textContent;
+      const listItem = createListItem(itemTitle, link, descItem);
+      ul.appendChild(listItem);
+    });
+
+    postContent.appendChild(ul);
+
+    state.elements.posts.innerHTML = '';
+    state.elements.posts.appendChild(postContent);
+
+    state.elements.feeds.innerHTML = '';
+    state.elements.feeds.appendChild(feedsContent);
+
+    mapping.valid();
+  }
 
   state.elements.form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -201,14 +219,19 @@ const initSite = () => {
       mapping[state.status]();
     }
   };
-  
+
   i18n.on('languageChanged', (lng) => {
     updateLanguageKeys(lng);
   });
-  
+
   updateLanguageKeys(i18n.language);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  initSite();
+  initI18n().then(() => {
+    initSite();
+
+    const myModal = new bootstrap.Modal(document.getElementById('modal'));
+    myModal.hide();
+  });
 });
