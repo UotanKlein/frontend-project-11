@@ -1,17 +1,12 @@
-/* eslint-disable linebreak-style */
-// eslint-disable-next-line import/no-unresolved
 import './index.css';
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
 import 'bootstrap/dist/css/bootstrap-utilities.min.css';
 import 'bootstrap/dist/css/bootstrap.css';
-// eslint-disable-next-line
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js';
-
 import onChange from 'on-change';
 import * as yup from 'yup';
 import i18n from 'i18next';
 import axios from 'axios';
-// eslint-disable-next-line
 import translations from './translations.js';
 
 const initI18n = () => i18n.init({
@@ -28,7 +23,13 @@ const schema = yup.object({
   input: yup.string().url().required(),
 });
 
-const validateForm = (obj) => schema.validate(obj);
+const validateForm = async (obj) => {
+  try {
+    await schema.validate(obj);
+  } catch (error) {
+    throw new Error('Invalid input URL');
+  }
+};
 
 const initSite = () => {
   const state = {
@@ -55,12 +56,10 @@ const initSite = () => {
 
   const watchedObject = onChange(state, (path, value) => {
     if (path === 'input') {
-      // eslint-disable-next-line
       updateRSS(value);
     }
 
     if (path === 'update') {
-      // eslint-disable-next-line
       setTimer();
     }
   });
@@ -104,29 +103,26 @@ const initSite = () => {
     },
   };
 
-  function updateRSS(value) {
-    validateForm({ input: value })
-      .then((validatedData) => {
-        axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(validatedData.input)}`).then((res) => {
-          const parser = new DOMParser();
-          const domRss = parser.parseFromString(res.data.contents, 'text/xml');
-          const rssElement = domRss.querySelector('rss');
-          if (!rssElement) {
-            mapping.invalidRSS();
-          }
-          const channel = domRss.querySelector('channel');
-          const feedTitle = channel.querySelector('title').textContent;
-          const feedDescription = channel.querySelector('description').textContent;
-          const items = domRss.querySelectorAll('item');
-          // eslint-disable-next-line
-          render(feedTitle, feedDescription, items);
-        })
-          // eslint-disable-next-line
-          .catch((error) => console.error(error.message));
-      })
-      .catch(() => {
-        mapping.invalidLink();
-      });
+  async function updateRSS(value) {
+    try {
+      await validateForm({ input: value });
+      const res = await axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(value)}`);
+      const parser = new DOMParser();
+      const domRss = parser.parseFromString(res.data.contents, 'text/xml');
+      const rssElement = domRss.querySelector('rss');
+      if (!rssElement) {
+        mapping.invalidRSS();
+        return;
+      }
+      const channel = domRss.querySelector('channel');
+      const feedTitle = channel.querySelector('title').textContent;
+      const feedDescription = channel.querySelector('description').textContent;
+      const items = domRss.querySelectorAll('item');
+      render(feedTitle, feedDescription, items);
+    } catch (error) {
+      console.error(error.message);
+      mapping.invalidLink();
+    }
   }
 
   function setTimer() {
@@ -136,7 +132,7 @@ const initSite = () => {
         setTimer();
       }, 20000);
     } else if (watchedObject.timer !== null) {
-      window.clearTimeout(watchedObject.timer);
+      clearTimeout(watchedObject.timer);
       watchedObject.timer = null;
     }
   }
@@ -220,9 +216,7 @@ const initSite = () => {
     }
   };
 
-  i18n.on('languageChanged', (lng) => {
-    updateLanguageKeys(lng);
-  });
+  i18n.on('languageChanged', updateLanguageKeys);
 
   updateLanguageKeys(i18n.language);
 };
