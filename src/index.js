@@ -107,10 +107,13 @@ const initSite = () => {
             state.mapping.updateStatus('invalidLink', 'text-danger', 'text-success');
         },
         invalidRSS: () => {
-            state.mapping.updateStatus('invalidRSS', 'incomplete', 'complete');
+            state.mapping.updateStatus('invalidRSS', 'text-danger', 'text-success');
         },
         alreadyExistsRSS: () => {
             state.mapping.updateStatus('RSSAlreadyExists', 'text-danger', 'text-success');
+        },
+        networkError: () => {
+            state.mapping.updateStatus('networkProblems', 'text-danger', 'text-success');
         },
         valid: () => {
             state.mapping.updateStatus('valid', 'text-success', 'text-danger');
@@ -127,16 +130,21 @@ const initSite = () => {
             const domRss = parser.parseFromString(res.data.contents, 'text/xml');
             const rssElement = domRss.querySelector('rss');
             if (!rssElement) {
-                state.mapping.invalidRSS();
-                return;
+                throw new Error('NotValidRss');
             }
             const channel = domRss.querySelector('channel');
             const feedTitle = channel.querySelector('title').textContent;
             const feedDescription = channel.querySelector('description').textContent;
             const items = domRss.querySelectorAll('item');
             render(feedTitle, feedDescription, items, value);
-        } catch (error) {
-            state.mapping.invalidLink();
+        } catch (err) {
+            if (err.name === 'ValidationError') {
+                state.mapping.invalidLink();
+            } else if (err.message === 'NotValidRss') {
+                state.mapping.invalidRSS();
+            } else if (axios.isAxiosError(err)) {
+                state.mapping.networkError();
+            }
         }
     }
 

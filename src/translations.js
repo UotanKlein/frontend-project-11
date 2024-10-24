@@ -15,6 +15,7 @@ const translations = {
             close: 'Закрыть',
             readFull: 'Читать полностью',
             RSSAlreadyExists: 'RSS уже существует',
+            networkProblems: 'Ошибка сети',
         },
     },
     en: {
@@ -33,6 +34,7 @@ const translations = {
             close: 'Close',
             readFull: 'Read completely',
             RSSAlreadyExists: 'RSS already exists',
+            networkProblems: 'Network error',
         },
     },
 };
