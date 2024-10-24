@@ -70,11 +70,11 @@ const initSite = () => {
         return;
       }
 
-      updateRSS(value);
+      state.updateRSS(value);
     }
 
     if (path === 'update') {
-      setTimer();
+      state.setTimer();
     }
   });
 
@@ -121,7 +121,7 @@ const initSite = () => {
     },
   };
 
-  async function updateRSS(value) {
+  state.updateRSS = async (value) => {
     try {
       await validateForm({ input: value });
       const url = encodeURIComponent(value);
@@ -136,7 +136,7 @@ const initSite = () => {
       const feedTitle = channel.querySelector('title').textContent;
       const feedDescription = channel.querySelector('description').textContent;
       const items = domRss.querySelectorAll('item');
-      render(feedTitle, feedDescription, items, value);
+      state.render(feedTitle, feedDescription, items, value);
     } catch (err) {
       if (err.message === 'Invalid input URL') {
         state.mapping.invalidLink();
@@ -146,21 +146,21 @@ const initSite = () => {
         state.mapping.networkError();
       }
     }
-  }
+  };
 
-  function setTimer() {
+  state.setTimer = () => {
     if (watchedObject.update) {
       watchedObject.timer = setTimeout(() => {
-        Object.keys(state.feeds).forEach((url) => updateRSS(url));
-        setTimer();
+        Object.keys(state.feeds).forEach((url) => state.updateRSS(url));
+        state.setTimer();
       }, 20000);
     } else if (watchedObject.timer !== null) {
       clearTimeout(watchedObject.timer);
       watchedObject.timer = null;
     }
-  }
+  };
 
-  function render(title, desc, items, url) {
+  state.render = (title, desc, items, url) => {
     const createFeedElement = (feedTitle, feedDesc) => {
       const feedElement = document.createElement('li');
       feedElement.classList.add('list-group-item', 'border-0');
@@ -272,7 +272,7 @@ const initSite = () => {
     });
 
     state.mapping.valid();
-  }
+  };
 
   state.elements.form.addEventListener('submit', (event) => {
     event.preventDefault();

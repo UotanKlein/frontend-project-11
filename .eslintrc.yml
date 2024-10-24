@@ -20,6 +20,3 @@ rules:
     - error
     - windows
   no-tabs: error
-  no-use-before-define:
-    - error
-    - { functions: false, variables: true, classes: true }
