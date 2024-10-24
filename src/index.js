@@ -259,8 +259,10 @@ const initSite = () => {
     state.elements.form.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        const valueInput = state.elements.input.value;
+        const rssInput = state.elements.input;
+        const valueInput = rssInput.value;
         watchedObject.input = valueInput;
+        rssInput.value = '';
     });
 
     const updateLanguageKeys = (lng) => {
