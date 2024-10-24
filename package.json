@@ -1,7 +1,7 @@
 {
-  "name": "my-webpack-project",
+  "name": "@hexlet/code",
   "version": "1.0.0",
-  "description": "My webpack project",
+  "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
     "watch": "webpack --watch",
     "serve": "webpack serve"
   },
-  "author": "",
+  "author": "Adik",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.24.3",
@@ -24,7 +24,7 @@
     "es-module-shims": "^1.9.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-import": "^2.31.0",
     "html-webpack-plugin": "^5.6.0",
     "jest": "^29.7.0",
     "prettier": "^3.2.5",

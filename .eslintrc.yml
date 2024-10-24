@@ -1,8 +1,25 @@
 env:
-  browser: true
-  es2021: true
-extends: airbnb-base
+    browser: true
+    es2021: true
+extends:
+    - airbnb-base
+    - plugin:import/errors
+    - plugin:import/warnings
 parserOptions:
-  ecmaVersion: latest
-  sourceType: module
-rules: {}
+    ecmaVersion: latest
+    sourceType: module
+rules:
+    import/extensions:
+        - error
+        - ignorePackages
+        - { js: 'always' }
+    indent:
+        - error
+        - 4
+    linebreak-style:
+        - error
+        - windows
+    no-tabs: error
+    no-use-before-define:
+        - error
+        - { functions: false, variables: true, classes: true }
