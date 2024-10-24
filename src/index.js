@@ -138,7 +138,7 @@ const initSite = () => {
             const items = domRss.querySelectorAll('item');
             render(feedTitle, feedDescription, items, value);
         } catch (err) {
-            if (err.name === 'ValidationError') {
+            if (err.message === 'Invalid input URL') {
                 state.mapping.invalidLink();
             } else if (err.message === 'NotValidRss') {
                 state.mapping.invalidRSS();
