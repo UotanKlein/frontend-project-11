@@ -112,7 +112,7 @@ const initSite = () => {
         try {
             await validateForm({ input: value });
             const url = encodeURIComponent(value);
-            const res = await axios.get(`https://allorigins.hexlet.app/get?url=${url}`);
+            const res = await axios.get(`https://allorigins.hexlet.app/get?url=${url}&disableCache=true`);
             const parser = new DOMParser();
             const domRss = parser.parseFromString(res.data.contents, 'text/xml');
             const rssElement = domRss.querySelector('rss');
