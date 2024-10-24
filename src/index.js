@@ -61,6 +61,15 @@ const initSite = () => {
 
     const watchedObject = onChange(state, (path, value) => {
         if (path === 'input') {
+            if (value === '') {
+                return;
+            }
+
+            if (state.feeds[value]) {
+                state.mapping.alreadyExistsRSS();
+                return;
+            }
+
             updateRSS(value);
         }
 
@@ -69,7 +78,7 @@ const initSite = () => {
         }
     });
 
-    const mapping = {
+    state.mapping = {
         changeTexts: () => {
             const { elements } = state;
             elements.title.textContent = i18n.t('title');
@@ -89,21 +98,22 @@ const initSite = () => {
             if (text === 'valid') {
                 elements.input.classList.remove('is-invalid');
                 elements.input.classList.add('is-valid');
-            } else if (text === 'invalidLink') {
+            } else if (text === 'invalidLink' || text === 'RSSAlreadyExists') {
                 elements.input.classList.remove('is-valid');
                 elements.input.classList.add('is-invalid');
             }
         },
         invalidLink: () => {
-            mapping.updateStatus('invalidLink', 'text-danger', 'text-success');
-            watchedObject.update = false;
+            state.mapping.updateStatus('invalidLink', 'text-danger', 'text-success');
         },
         invalidRSS: () => {
-            mapping.updateStatus('invalidRSS', 'incomplete', 'complete');
-            watchedObject.update = false;
+            state.mapping.updateStatus('invalidRSS', 'incomplete', 'complete');
+        },
+        alreadyExistsRSS: () => {
+            state.mapping.updateStatus('RSSAlreadyExists', 'text-danger', 'text-success');
         },
         valid: () => {
-            mapping.updateStatus('valid', 'text-success', 'text-danger');
+            state.mapping.updateStatus('valid', 'text-success', 'text-danger');
             watchedObject.update = true;
         },
     };
@@ -117,23 +127,23 @@ const initSite = () => {
             const domRss = parser.parseFromString(res.data.contents, 'text/xml');
             const rssElement = domRss.querySelector('rss');
             if (!rssElement) {
-                mapping.invalidRSS();
+                state.mapping.invalidRSS();
                 return;
             }
             const channel = domRss.querySelector('channel');
             const feedTitle = channel.querySelector('title').textContent;
             const feedDescription = channel.querySelector('description').textContent;
             const items = domRss.querySelectorAll('item');
-            render(feedTitle, feedDescription, items, url);
+            render(feedTitle, feedDescription, items, value);
         } catch (error) {
-            mapping.invalidLink();
+            state.mapping.invalidLink();
         }
     }
 
     function setTimer() {
         if (watchedObject.update) {
             watchedObject.timer = setTimeout(() => {
-                updateRSS(watchedObject.input);
+                Object.keys(state.feeds).forEach((url) => updateRSS(url));
                 setTimer();
             }, 20000);
         } else if (watchedObject.timer !== null) {
@@ -253,7 +263,7 @@ const initSite = () => {
             }
         });
 
-        mapping.valid();
+        state.mapping.valid();
     }
 
     state.elements.form.addEventListener('submit', (event) => {
@@ -263,12 +273,13 @@ const initSite = () => {
         const valueInput = rssInput.value;
         watchedObject.input = valueInput;
         rssInput.value = '';
+        watchedObject.input = '';
     });
 
     const updateLanguageKeys = (lng) => {
-        mapping.changeTexts(lng);
+        state.mapping.changeTexts(lng);
         if (state.status !== 'none') {
-            mapping[state.status]();
+            state.mapping[state.status]();
         }
     };
 

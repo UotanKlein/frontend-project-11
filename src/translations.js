@@ -14,12 +14,13 @@ const translations = {
             view: 'Просмотр',
             close: 'Закрыть',
             readFull: 'Читать полностью',
+            RSSAlreadyExists: 'RSS уже существует',
         },
     },
     en: {
         translation: {
             title: 'RSS aggregator',
-            subtitle: 'Start reading RSS today! It\'s easy, it\'s beautiful.',
+            subtitle: "Start reading RSS today! It's easy, it's beautiful.",
             example: 'Example: https://lorem-rss.hexlet.app/feed',
             button: 'Add',
             invalidRSS: 'The resource does not contain a valid RSS',
@@ -31,6 +32,7 @@ const translations = {
             view: 'View',
             close: 'Close',
             readFull: 'Read completely',
+            RSSAlreadyExists: 'RSS already exists',
         },
     },
 };
